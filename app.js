@@ -1,6 +1,5 @@
-//Не хотите мучатся с установкой бота? Не мучайтесь!
-// https://discord.com/oauth2/authorize?client_id=747114461361471589&scope=bot&permissions=8 
 
+// БОТ DEPRECATED И ОН ТИПА ВСЁ
 
 const Discord = require('v11-discord.js');
 const client = new Discord.Client();
