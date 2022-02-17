@@ -1,121 +1,127 @@
+try{
 
-// БОТ DEPRECATED И ОН ТИПА ВСЁ
+const yt = require('youtube-info-streams');
+const { Client, Intents } = require('discord.js');
+const { token,guildId } = require('./config.json');
+// Create a new client instance
 
-const Discord = require('v11-discord.js');
-const client = new Discord.Client();
-function getParameterByName(name, url) {
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
-client.login('TOKENHERE');
+const fs = require('fs');
+const myIntents = new Intents();
+myIntents.add(Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES);
+const play = require('play-dl'); // Everything
+const { Spotify } = require('spotify-it')
+let resource;
+const { MessageAttachment } = require('discord.js');
+const client = new Client({ intents: myIntents });
+const {
+	AudioPlayerStatus,
+	StreamType,
+	createAudioPlayer,
+	createAudioResource,
+	joinVoiceChannel,
+} = require('@discordjs/voice');
 
-client.on('message', message => {
-  // Voice only works in guilds, if the message does not come from a guild,
-  // we ignore it
-  if (!message.guild) return;
-  if (message.content == '/dc') {try{
-          if (typeof message.member.voiceChannel !== 'undefined') {
-message.member.voiceChannel.leave();
-message.channel.send('Отключился!');
-    }}catch(err){
-  console.log(err);
-  message.channel.send("Произошла ошибка.");
- }
-   }
- if (message.content.includes('/setvol') ===true) {
-  try{    
-          if (typeof message.member.voiceChannel !== 'undefined') {
-if(message.content.length >7){
-  let vol = message.content.substring(8,11);
-  if(isNaN(vol) == false){
-    console.log(vol);
-      message.member.voiceChannel.join()
-        .then(connection => { connection.dispatcher.setVolume(vol);
-          message.channel.send('Громкость изменена на '+vol+'.');
- });}
-    }else{
-      message.channel.send('Ошибка. Громкость не является числом.');
-    }}}
-catch(err){
-  console.log(err);
-  message.channel.send("Произошла ошибка.");
- }
-
-  }
-     if (message.content.includes('/pause') ===true) {
-                     try{
-           if (typeof message.member.voiceChannel !== 'undefined') {
-      message.member.voiceChannel.join()
-        .then(connection => { connection.dispatcher.pause();
-          message.channel.send('Приостановлено.')
- });}
-   
-}catch(err){
-  console.log(err);
-  message.channel.send("Произошла ошибка.");
- }}
-    if (message.content.includes('/resume') ===true) {try{
-          if (message.member.voiceChannel) {
-      message.member.voiceChannel.join()
-        .then(connection => { connection.dispatcher.resume();
-          message.channel.send('Возобновлено.')
- });}
-   
-}catch(err){
-  console.log(err);
-  message.channel.send("Произошла ошибка.");
- }}
-  if (message.content.includes('/play') ===true) {
-    if(message.content.length > 5){
-      try{
-          if (typeof message.member.voiceChannel !== 'undefined') {
-      message.member.voiceChannel.join()
-        .then(connection => { // Connection is an instance of VoiceConnection
-  const ytdl = require('ytdl-core');
-const streamOptions = { seek: 0, volume: 1 };
-console.log(message.content.substring(6,9999));
-    const stream = ytdl(message.content.substring(6,9999), { filter : 'audioonly' });
-//let videoid = searchParams.toString();
-let videoid =     (getParameterByName("v",message.content.substring(6,9999)));
-    const dispatcher = connection.playStream(stream, streamOptions);
-   const embed = new Discord.RichEmbed();
-      // Set the title of the field
-      const httpclient = require('http');
-      const options = {
-        method: 'GET',
-  host: 'regoggles.mrcheat.ga',
-  port: 80,
-  path: '/video.php?v='+videoid
-
-};
-//console.log(options);
-// Make a request
-//console.log(searchParams.get("v"));
-let res;
-let videodetails;
-httpclient.get(options, function(res) {
-  var body = '';
-  res.on('data', function(chunk) {
-    body += chunk;
-  });
-  res.on('end', function() {
-  let embeddsta =(JSON.parse(body)['videodata']);
-  console.log(embeddsta);
-  embed.setTitle("Сейчас играет: "+ embeddsta['title']+" от "+embeddsta['author']);
-  embed.setImage(embeddsta['thumbnail']['thumbnails']['3']['url']);
-  embed.setDescription(embeddsta['shortDescription'].substring(0,75));
-        message.channel.send(embed);
-
-  });
+const spotify = new Spotify({
+	id: 'id',
+	secret: 'secret',
+	defaultLimit: 10 // default track limit for playlist & album
+}) // secert & id c
+const player = createAudioPlayer();
+client.once('ready', () => {
+	console.log('Ready!');
+	client.user.setActivity('игры');
 });
-    
-        });}}catch(err){
-  console.log(err);
-  message.channel.send("Произошла ошибка.");
- }}
-    } 
-  }   );
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isCommand()) return;
+
+		const { commandName } = interaction;
+		if (interaction.commandName === 'play') {
+const url = interaction.options.getString('url');
+if (url == undefined)  {
+	await interaction.reply({content: "https://www.youtube.com/watch?v=vXGTO7Ftro4"});
+}else{
+
+const connection = joinVoiceChannel({
+	channelId: interaction.member.voice.channel.id,
+	guildId: interaction.member.guild.id,
+	adapterCreator:interaction.member.voice.guild.voiceAdapterCreator,
+});
+ let searched;
+        //https://open.spotify.com/track/7CCCX50zGHMTuHsyKQy03l
+        if (Spotify.validate(url, 'TRACK')) {
+        let sp_data = await play.spotify(url) // This will get spotify data from the url [ I used track url, make sure to make a logic for playlist, album ]
+        
+         searched = await play.search(`${sp_data.name}`, {
+            limit: 1
+        }) // This will search the found track on youtube.
+    }else{
+       searched = await play.search(url, {
+            limit: 1
+        }) 	
+    }
+
+const video = await yt.info(searched[0].id);
+if(video['videoDetails']['isFamilySafe'] ==false){
+	await interaction.reply({content:"Данное видео не может быть воспроизведено т.к имеет возрастные ограничения"});
+}else{
+        let stream = await play.stream(searched[0].url) // This will create stream from the above search
+         resource = createAudioResource(stream.stream, {
+            inputType: stream.type
+        })
+        player.play(resource);
+        let urlThumb;
+        if ( searched[0].thumbnails == undefined) { urlThumb =""}else{
+        	 urlThumb=searched[0].thumbnails[0].url;
+        }
+        console.log(searched);
+const exampleEmbed = {
+	title: searched[0].title,
+	description: searched[0].url,
+	image: {
+		url: urlThumb,
+	},
+};
+
+        connection.subscribe(player)
+		await interaction.reply({ embeds: [exampleEmbed]});		
+}}}
+		if (interaction.commandName === 'stop') {
+			if (player !==undefined) {
+				player.stop();
+				interaction.reply("Остановлено.");
+			}else{
+					await interaction.reply({content: "https://www.youtube.com/watch?v=vXGTO7Ftro4"});
+			}
+			}
+			if (interaction.commandName === 'pause') {
+			if (player !==undefined) {
+				player.pause();
+				interaction.reply("Пристановлено.");
+			}else{
+					await interaction.reply({content: "https://www.youtube.com/watch?v=vXGTO7Ftro4"});
+			}}
+
+			if (interaction.commandName === 'resume') {
+			if (player !==undefined) {
+				player.unpause();
+				interaction.reply("Возобновлено.");
+				}else{
+					await interaction.reply({content: "https://www.youtube.com/watch?v=vXGTO7Ftro4"});
+			}
+		}
+			if (interaction.commandName === 'showpenis') {
+					await interaction.reply({content: "НЕГАЙНО ПОКАЖИ ПЕНИС \n https://www.youtube.com/watch?v=vXGTO7Ftro4"});
+		}
+			if (interaction.commandName === 'setvol') {
+				const vol = interaction.options.getInteger('volume')/100;
+				//resource.volume = (vol);
+				console.log(player);
+				interaction.reply("Громкость изменена.");
+		}	
+});
+// Login to Discord with your client's token
+client.login(token);
+}catch(err){
+	console.log("Error: "+err);
+}
+	
