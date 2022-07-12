@@ -1,0 +1,32 @@
+{
+  "name": "musicbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.5.3",
+    "@discordjs/rest": "^0.2.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
+    "discord-api-types": "^0.26.1",
+    "discord-reply": "^0.1.2",
+    "discord.js": "^13.6.0",
+    "forever-monitor": "^1.5.2",
+    "get-video-id": "^3.5.3",
+    "node-spotify-youtube-downloader": "^0.9.1",
+    "play-dl": "^1.9.4",
+    "spdl-core": "^2.0.2",
+    "spotify-dl": "^1.0.7",
+    "spotify-it": "^1.2.1",
+    "youtube-dl-exec": "^2.0.2",
+    "youtube-info-streams": "^1.0.8",
+    "youtube.get-video-info": "^1.0.2",
+    "ytdl": "^1.4.1",
+    "ytdl-core": "^4.10.0"
+  }
+}

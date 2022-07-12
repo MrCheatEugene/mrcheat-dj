@@ -1,4 +1,3 @@
-try{
 
 const yt = require('youtube-info-streams');
 const { Client, Intents } = require('discord.js');
@@ -22,8 +21,8 @@ const {
 } = require('@discordjs/voice');
 
 const spotify = new Spotify({
-	id: 'id',
-	secret: 'secret',
+	id: 'Айди спотифая',
+	secret: 'Секрет спотифая',
 	defaultLimit: 10 // default track limit for playlist & album
 }) // secert & id c
 const player = createAudioPlayer();
@@ -32,6 +31,7 @@ client.once('ready', () => {
 	client.user.setActivity('игры');
 });
 client.on('interactionCreate', async interaction => {
+	try{
 	if (!interaction.isCommand()) return;
 
 		const { commandName } = interaction;
@@ -40,7 +40,10 @@ const url = interaction.options.getString('url');
 if (url == undefined)  {
 	await interaction.reply({content: "https://www.youtube.com/watch?v=vXGTO7Ftro4"});
 }else{
-
+	console.log(interaction.member.voice.channel);
+if(interaction.member.voice.channel == undefined){
+	await interaction.reply({content:"Зайдите в голосовой канал!"})
+}else{
 const connection = joinVoiceChannel({
 	channelId: interaction.member.voice.channel.id,
 	guildId: interaction.member.guild.id,
@@ -59,14 +62,21 @@ const connection = joinVoiceChannel({
             limit: 1
         }) 	
     }
-
+if(searched[0] == undefined){
+	await interaction.reply({content:"Ошибка! Не удалось получить информацию о видео"});
+}else{
 const video = await yt.info(searched[0].id);
 if(video['videoDetails']['isFamilySafe'] ==false){
 	await interaction.reply({content:"Данное видео не может быть воспроизведено т.к имеет возрастные ограничения"});
 }else{
+	console.log(searched[0].url);
+	if (searched[0].url== undefined) {
+			await interaction.reply({content:"Ошибка! Не удалось получить информацию о видео"});
+	}
         let stream = await play.stream(searched[0].url) // This will create stream from the above search
          resource = createAudioResource(stream.stream, {
-            inputType: stream.type
+            inputType: stream.type,
+			inlineVolume: true,
         })
         player.play(resource);
         let urlThumb;
@@ -76,15 +86,16 @@ if(video['videoDetails']['isFamilySafe'] ==false){
         console.log(searched);
 const exampleEmbed = {
 	title: searched[0].title,
-	description: searched[0].url,
+	description: searched[0].description+"\n Дата загрузки: "+searched[0].uploadedAt,
 	image: {
-		url: urlThumb,
+		url: urlThumb
 	},
 };
 
         connection.subscribe(player)
-		await interaction.reply({ embeds: [exampleEmbed]});		
-}}}
+		await interaction.reply({ embeds: [exampleEmbed]});	
+		}	
+}}}}
 		if (interaction.commandName === 'stop') {
 			if (player !==undefined) {
 				player.stop();
@@ -114,14 +125,16 @@ const exampleEmbed = {
 		}
 			if (interaction.commandName === 'setvol') {
 				const vol = interaction.options.getInteger('volume')/100;
-				//resource.volume = (vol);
+				resource.volume.setVolume(vol);
 				console.log(player);
-				interaction.reply("Громкость изменена.");
+				await interaction.reply("Громкость изменена.");
 		}	
+		}
+catch(err){
+	await interaction.reply("Произошла **КРИТИЧЕСКАЯ** ошибка! Вот список вещей которые могли произойти: \n 1. Контент недоступен \n 2. Какому-то API не удалось получить аудио или информацию о нём. \n 3. Что-то сломалось \n **И что делать?** \n Попробуйте выполнить команду ещё раз, и посмотреть что изменилось.");
+	console.log(err);
+}
+	
 });
 // Login to Discord with your client's token
 client.login(token);
-}catch(err){
-	console.log("Error: "+err);
-}
-	
