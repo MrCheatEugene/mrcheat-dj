@@ -1,5 +1,4 @@
 {
-	"clientId": "Клиент ID бота",
-	"guildId": "ID сервера",
-	"token": "Токен"
+	"clientId":"Client ID бота",
+	"token": "ТОКЕН",
 }
