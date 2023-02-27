@@ -5,7 +5,9 @@ const { clientId, token } = require('./config.json');
 
 const commands = [
 	new SlashCommandBuilder().setName('play').setDescription('Воспроизвести Youtube видео/Песню из Spotify/найти песню(в параметре url пиши поисковый запрос)')	.addStringOption(option => option.setName('url').setDescription('Ссылка на видео')),
-	new SlashCommandBuilder().setName('playvk').setDescription('Воспроизвести музыку из VK (Введите имя трека)'.addStringOption(option => option.setName('url').setDescription('Ссылка на видео')),
+	new SlashCommandBuilder().setName('playvk').setDescription('Воспроизвести музыку из VK (Введите имя трека)').addStringOption(option => option.setName('url').setDescription('Ссылка на видео')),
+	new SlashCommandBuilder().setName('lolz').setDescription('✅ LOLZTeam радио, работаем ✅'),
+	new SlashCommandBuilder().setName('stream').setDescription('Воспроизвести любой аудио-стрим').addStringOption(option => option.setName('stream').setDescription('Аудио-стрим')),
 	new SlashCommandBuilder().setName('stop').setDescription('Остановить воспроизведение'),
 	new SlashCommandBuilder().setName('pause').setDescription('Приостановить воспроизведение'),
 	new SlashCommandBuilder().setName('resume').setDescription('Возобновить воспроизведение'),

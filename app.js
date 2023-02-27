@@ -1,4 +1,4 @@
-const {Client, Intents} = require('discord.js');
+const { Client, Intents } = require('discord.js');
 const {token} = require('./config.json');
 var resources={};
 var players={};
@@ -7,7 +7,7 @@ const subProcess = require('child_process')
 const myIntents = new Intents();
 myIntents.add(Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES);
 const play = require('play-dl'); // Everything
-const {MessageAttachment} = require('discord.js');
+const { MessageAttachment } = require('discord.js');
 const client = new Client({ intents: myIntents });
 const {
 	AudioPlayerStatus,
@@ -64,6 +64,86 @@ client.on('interactionCreate', async interaction => {
 			var resource=getResource(gid);
 			if (interaction.commandName === 'ping') {
 				await interaction.editReply({content: "https://www.youtube.com/watch?v=y8R6X5IDDtA"});
+			}else if (interaction.commandName === 'lolz') {
+				console.log(interaction.member.voice.channel);
+				if(interaction.member.voice.channel == undefined){
+					await interaction.editReply({content:"Зайдите в голосовой канал!"})
+				}else{
+					let connection = joinVoiceChannel({
+						channelId: interaction.member.voice.channel.id,
+						guildId: interaction.member.guild.id,
+						adapterCreator:interaction.member.voice.guild.voiceAdapterCreator,
+					});
+				 	var player=getPlayer(gid)
+					if (typeof getPlayer(gid)=='undefined' || getPlayer(gid)!=undefined && (getPlayer(gid).play==undefined)){
+						var player = createAudioPlayer();
+						setPlayer(gid,player)
+					}
+					setPlayer(gid,player)
+    				let cr=  createAudioResource("https://listen1.myradio24.com/lolz", {
+						inlineVolume: true,
+    				});
+    				setResource(gid,cr);
+    				setPlayer(gid,player);
+    				player.play(cr);
+    				setPlayer(gid,player);
+					const exampleEmbed = {
+						title: "LOLZTeam радио",
+						description: "✅ LOLZTeam Радио, работаем ✅\n\nВся инфа: https://zelenka.guru/threads/4824288/",
+						image: {
+							url:"https://i.imgur.com/5gtG3DI.jpg"
+						}
+					};
+					setPlayer(gid,player)
+			        getVoiceConnection(gid).subscribe(getPlayer(gid))
+					try{
+						interaction.editReply({ embeds: [exampleEmbed]}).then(r=>{return;});	
+					}catch(e){
+						//console.log(e);
+						interaction.editReply({ embeds: [exampleEmbed]}).then(r=>{return;});
+					}
+				}
+			}else if (interaction.commandName === 'stream') {
+				console.log(interaction.member.voice.channel);
+				if(interaction.member.voice.channel == undefined){
+					await interaction.editReply({content:"Зайдите в голосовой канал!"})
+				}else{
+					const data = interaction.options.getString('stream');
+					if (url == undefined){
+						interaction.editReply({content: "https://www.youtube.com/watch?v=vXGTO7Ftro4"}).then(r=>{return;});
+						return;
+					}
+					let connection = joinVoiceChannel({
+						channelId: interaction.member.voice.channel.id,
+						guildId: interaction.member.guild.id,
+						adapterCreator:interaction.member.voice.guild.voiceAdapterCreator,
+					});
+				 	var player=getPlayer(gid)
+					if (typeof getPlayer(gid)=='undefined' || getPlayer(gid)!=undefined && (getPlayer(gid).play==undefined)){
+						var player = createAudioPlayer();
+						setPlayer(gid,player)
+					}
+					setPlayer(gid,player)
+    				let cr=  createAudioResource(data, {
+						inlineVolume: true,
+    				});
+    				setResource(gid,cr);
+    				setPlayer(gid,player);
+    				player.play(cr);
+    				setPlayer(gid,player);
+					const exampleEmbed = {
+						title: "Аудио-стрим",
+						description: "🎵 Стрим: "+data
+					};
+					setPlayer(gid,player)
+			        getVoiceConnection(gid).subscribe(getPlayer(gid))
+					try{
+						interaction.editReply({ embeds: [exampleEmbed]}).then(r=>{return;});	
+					}catch(e){
+						//console.log(e);
+						interaction.editReply({ embeds: [exampleEmbed]}).then(r=>{return;});
+					}
+				}
 			}else if (interaction.commandName === 'playvk') {
 				console.log(interaction.member.voice.channel);
 				if(interaction.member.voice.channel == undefined){
